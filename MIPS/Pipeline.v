@@ -5,11 +5,12 @@
 `include "ALUControlUnit.v"
 `include "MainControlUnit.v"
 `include "ALU32.v"
+`include "PCmux.v"
 
-module pipeline(Instruction, clk);
+module pipeline(clk, reset);
 
-    input [31:0] Instruction;
-    input clk;
+    reg [31:0] Instruction;
+    input clk, reset;
 
     wire RegDst, ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch, Jump, SignZero;
 
@@ -55,8 +56,36 @@ module pipeline(Instruction, clk);
     end
 
 
+    // Instruction Fetch Stage
+
+    reg [31:0] pc_current;
+    wire [31:0] pc_next;
+    // wire [31:0] pc_out;
+    reg [31:0]instructionMemory[1023:0];
+
+    initial
+    begin
+        $readmemb("instr.txt", instructionMemory);
+    end
+
+    always @(posedge clk or posedge reset)
+    begin
+        if(reset)
+            pc_current <= 32'b0;
+        else
+            pc_current <= pc_next;
+    end
+
     
+
+    always @(pc_current)
+    begin
+        Instruction = instructionMemory[pc_current/4];
+    end
+
+    // assign pc_out = pc_current;
     
+
     // Instruction Decode Stage
 
     wire [4:0] ReadReg1 = Instruction[25:21];
@@ -155,6 +184,21 @@ module pipeline(Instruction, clk);
             begin
                 $display("Reg Written Data = %0d\n", WriteData);   
             end
+
+    // Update the PC
+
+    wire [31:0] shiftLeft2Output;
+    wire [31:0] pc_plus_4;
+    wire [31:0] branchAddResult;
+
+    assign shiftLeft2Output = {SignExInstr[29:0], 1'b0, 1'b0};
+    assign pc_plus_4 = pc_current + 32'b0100;
+    assign branchAddResult = shiftLeft2Output + pc_plus_4;
+
+    wire PCSrc;
+
+    and andForPC(PCSrc, SignZero, Branch);
+    PCmux PCmux1(pc_next, pc_plus_4, branchAddResult, PCSrc);
 
 endmodule
 
