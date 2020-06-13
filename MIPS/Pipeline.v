@@ -6,9 +6,10 @@
 `include "MainControlUnit.v"
 `include "ALU32.v"
 
-module pipeline(Instruction);
+module pipeline(Instruction, clk);
 
     input [31:0] Instruction;
+    input clk;
 
     wire RegDst, ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch, Jump, SignZero;
 
@@ -16,6 +17,12 @@ module pipeline(Instruction);
 
     Control C1(RegDst, ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch, ALUOp, Jump, SignZero, Instruction[31:26]);
 
+    // always @(posedge clk)
+    // begin
+    //     $display("Control Signals\n");
+    //     $display("RegDst = %d\tALUSrc = %d\tMemtoReg = %d\t\n", RegDst, ALUSrc, MemtoReg);   
+    // end
+           
 
     
     //  Register File
@@ -68,6 +75,10 @@ module pipeline(Instruction);
     assign ReadData2 = regFile[ReadReg2];
 
 
+    always @(posedge clk)
+    begin
+        $display("ReadData1 = %0d\tReadData2 = %0d\nWrite Reg = %0d", ReadData1, ReadData2, WriteReg);   
+    end
     
     
     // ALU Stage
@@ -95,6 +106,12 @@ module pipeline(Instruction);
 
     ALU_32b A32(ReadData1, ALUoperand2, ALUControl, ALUResult, Overflow, Zero);
 
+
+    always @(posedge clk)
+    begin
+        $display("ALU Result = %0d\n", ALUResult);   
+    end
+
     
     
     
@@ -112,6 +129,12 @@ module pipeline(Instruction);
     assign MemReadData = Mem[ALUResult];
 
 
+    always @(posedge clk)
+    begin
+        $display("Written Data = %0d\tMemRead Data = %0d\n", ReadData2, MemReadData);   
+    end
+
+
     
     
     // Write Back Stage 
@@ -127,6 +150,11 @@ module pipeline(Instruction);
             regFile[WriteReg] = WriteData;
         end
     end
+
+    always @(posedge clk)
+            begin
+                $display("Reg Written Data = %0d\n", WriteData);   
+            end
 
 endmodule
 
