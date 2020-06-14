@@ -32,7 +32,7 @@ module uPOWER_ALUControlUnit(ALUControl, ALUOp, OpCode, XO);
     always @(ALUControlIn)
         casex (ALUControlIn)
             17'b00xxxxxxxxxxxxxxx: ALUCtrl<=4'b0010;  // ALU Operation: Add ; Instruction: LW-SW
-            17'b01xxxxxxxxxxxxxxx: ALUCtrl<=4'b0110;  // ALU Operation: Sub ; Instruction: BNE
+            17'b01xxxxxxxxxxxxxxx: ALUCtrl<=4'b0110;  // ALU Operation: Sub ; Instruction: BEQ
             17'b10001110xxxxxxxxx: ALUCtrl<=4'b0010;  // ALU Operation: Add ; Instruction: Add Imm
             17'b10011000xxxxxxxxx: ALUCtrl<=4'b0001;  // ALU Operation: Or  ; Instruction: Or Imm
             17'b10011100xxxxxxxxx: ALUCtrl<=4'b0000;  // ALU Operation: AND ; Instruction: And Imm
