@@ -22,18 +22,18 @@ module Control(RegDst, ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch, AL
                         Jump = 1'b0;
                         SignZero= 1'b0;
                     end
-        6'b111010 : begin // Immediate
-                        RegDst = 1'b0;
-                        ALUSrc = 1'b1;
-                        MemtoReg= 1'b0;
-                        RegWrite= 1'b1;
-                        MemRead = 1'b0;
-                        MemWrite= 1'b0;
-                        Branch = 1'b0;
-                        ALUOp = 2'b10;
-                        Jump = 1'b0;
-                        SignZero= 1'b0; // sign extend
-                    end
+        // 6'b111010 : begin // Immediate
+        //                 RegDst = 1'b0;
+        //                 ALUSrc = 1'b1;
+        //                 MemtoReg= 1'b0;
+        //                 RegWrite= 1'b1;
+        //                 MemRead = 1'b0;
+        //                 MemWrite= 1'b0;
+        //                 Branch = 1'b0;
+        //                 ALUOp = 2'b10;
+        //                 Jump = 1'b0;
+        //                 SignZero= 1'b0; // sign extend
+        //             end
         6'b111010 : begin // DS - load Double Word
                         RegDst = 1'b0;
                         ALUSrc = 1'b1;

@@ -65,7 +65,7 @@ module pipeline(clk, reset);
 
     initial
     begin
-        $readmemb("demo.txt", instructionMemory);
+        $readmemb("demo2.txt", instructionMemory);
     end
 
     always @(posedge clk or posedge reset)

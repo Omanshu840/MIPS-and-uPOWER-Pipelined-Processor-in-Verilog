@@ -65,7 +65,7 @@ module pipeline(clk, reset);
 
     initial
     begin
-        $readmemb("demo.txt", instructionMemory);
+        $readmemb("demo2.txt", instructionMemory);
     end
 
     always @(posedge clk or posedge reset)
@@ -208,7 +208,7 @@ module pipeline(clk, reset);
         $display("Time is ", $time);
         $display("IF Stage\n\nInstruction = %b\n\n", Instruction);
         $display("ID Stage\n\nReadData1 = %0d\tReadData2 = %0d\nWrite Reg = %0d\n\n", ReadData1, ReadData2, WriteReg);
-        $display("ALU Stage\n\nALU Result = %0d, Zero flag = %b\n\n", ALUResult, Zero);
+        $display("ALU Stage\n\nALUOperand2 = %0d, ALUOp = %b, ALU Result = %0d, Zero flag = %b\n\n", ALUoperand2, ALUOp, ALUResult, Zero);
         $display("Memory Stage\n\nMemRead Data = %0d\n\n", MemReadData);
         $display("Write Back stage\n\nWBmuxOutput = %0d, RegWriteSignal = %b\n\n", WriteData, RegWrite);
         $display("Update PC stage\n\npc_next = %0d\n\n\n\n", pc_next);
