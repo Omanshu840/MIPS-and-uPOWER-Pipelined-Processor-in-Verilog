@@ -1,4 +1,4 @@
-module WBmux(Y, D0, D1, S);
+module PCmux(Y, D0, D1, S);
 
     output [63:0] Y;
     input [63:0] D0, D1;

@@ -214,6 +214,12 @@ module ALU_64b(a, b, ALUOperatn, Result, Overflow, Zero);
 	ALU_1b_Ordinary A62(a[62], b[62], 1'b0, ALUOperatn[3], ALUOperatn[2], CarryOut[61], ALUOperatn[1:0], Result[62], CarryOut[62]);
 	ALU_1b_Most_Significant A63(a[63], b[63], 1'b0, ALUOperatn[3], ALUOperatn[2], CarryOut[62], ALUOperatn[1:0], Result[63], Set, Overflow, CarryOut[63]);
 
-	nor K1(Zero, Result[0], Result[1], Result[2], Result[3], Result[4], Result[5], Result[6], Result[7], Result[8], Result[9], Result[10], Result[11], Result[12], Result[13], Result[14], Result[15], Result[16], Result[17], Result[18], Result[19], Result[20], Result[21], Result[22], Result[23], Result[24], Result[25], Result[26], Result[27], Result[28], Result[29], Result[30], Result[31]);
+	nor K1(Zero, Result[0], Result[1], Result[2], Result[3], Result[4], Result[5], Result[6], Result[7], Result[8], Result[9], Result[10],
+	Result[11], Result[12], Result[13], Result[14], Result[15], Result[16], Result[17], Result[18], Result[19], Result[20],
+	Result[21], Result[22], Result[23], Result[24], Result[25], Result[26], Result[27], Result[28], Result[29], Result[30],
+	Result[31], Result[32], Result[33], Result[34], Result[35], Result[36], Result[37], Result[38], Result[39], Result[40],
+	Result[41], Result[42], Result[43], Result[44], Result[45], Result[46], Result[47], Result[48], Result[49], Result[50],
+	Result[51], Result[52], Result[53], Result[54], Result[55], Result[56], Result[57], Result[58], Result[59], Result[60],
+	Result[61], Result[62], Result[63]);
 
 endmodule

@@ -6,10 +6,10 @@
 `include "MainControlUnit.v"
 `include "ALU64.v"
 
-module pipeline(Instruction, clk);
+module pipeline(clk, reset);
 
-    input [31:0] Instruction;
-    input clk;
+    reg [31:0] Instruction;
+    input clk, reset;
 
     wire RegDst, ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch, Jump, SignZero;
 
@@ -27,7 +27,7 @@ module pipeline(Instruction, clk);
     
     //  Register File
 
-    reg [31:0] regFile[0:31];
+    reg [63:0] regFile[0:31];
 
     integer i;
     
@@ -44,7 +44,7 @@ module pipeline(Instruction, clk);
     
     // Data Memory
 
-    reg [31:0] Mem[0:31];
+    reg [63:0] Mem[0:31];
 
     initial
     begin
@@ -55,7 +55,36 @@ module pipeline(Instruction, clk);
     end
 
 
+    // Instruction Fetch Stage
+
+    reg [63:0] pc_current;
+    wire [63:0] pc_next;
+    // wire [31:0] pc_out;
+    reg [31:0]instructionMemory[1023:0];
+
+    initial
+    begin
+        $readmemb("instr.txt", instructionMemory);
+    end
+
+    always @(posedge clk or posedge reset)
+    begin
+        if(reset)
+            pc_current <= 64'b0;
+        else
+            pc_current <= pc_next;
+    end
+
     
+
+    always @(pc_current)
+    begin
+        Instruction = instructionMemory[pc_current/4];
+    end
+
+    // assign pc_out = pc_current;
+
+
     
     // Instruction Decode Stage
 
@@ -67,8 +96,8 @@ module pipeline(Instruction, clk);
     Regmux R1(WriteReg, Instruction[20:16], Instruction[15:11], RegDst);
 
 
-    wire [31:0] ReadData1;
-    wire [31:0] ReadData2;
+    wire [63:0] ReadData1;
+    wire [63:0] ReadData2;
 
 
     assign ReadData1 = regFile[ReadReg1];
@@ -90,26 +119,26 @@ module pipeline(Instruction, clk);
     uPOWER_ALUControlUnit AC(ALUControl, ALUOp, Instruction[31:26], Instruction[9:1]);
 
 
-    wire [31:0] SignExInstr;
+    wire [63:0] SignExInstr;
 
     assign SignExInstr[15:0] = Instruction[15:0];
-    assign SignExInstr[31:16] = {16{Instruction[15]}};
+    assign SignExInstr[63:16] = {48{Instruction[15]}};
 
 
-    wire [31:0] ALUoperand2;
+    wire [63:0] ALUoperand2;
 
     ALUmux AM1(ALUoperand2, ReadData2, SignExInstr, ALUSrc);
 
-    wire [31:0] ALUResult;
+    wire [63:0] ALUResult;
 
     wire Zero,Overflow;
 
-    ALU_64b A32(ReadData1, ALUoperand2, ALUControl, ALUResult, Overflow, Zero);
+    ALU_64b ALU64(ReadData1, ALUoperand2, ALUControl, ALUResult, Overflow, Zero);
 
 
     always @(posedge clk)
     begin
-        $display("ALU Result = %0d\n", ALUResult);   
+        $display("ALU Result = %0d\n", ALUResult);
     end
 
     
@@ -124,7 +153,7 @@ module pipeline(Instruction, clk);
         end
     end
 
-    wire [31:0] MemReadData;
+    wire [63:0] MemReadData;
 
     assign MemReadData = Mem[ALUResult];
 
@@ -139,7 +168,7 @@ module pipeline(Instruction, clk);
     
     // Write Back Stage 
 
-    wire [31:0] WriteData;
+    wire [63:0] WriteData;
 
     WBmux WB1(WriteData, MemReadData, ALUResult, MemtoReg);
 
@@ -155,6 +184,23 @@ module pipeline(Instruction, clk);
             begin
                 $display("Reg Written Data = %0d\n", WriteData);   
             end
+    
+
+    // Update the PC
+
+    wire [63:0] shiftLeft2Output;
+    wire [63:0] pc_plus_4;
+    wire [63:0] branchAddResult;
+
+    assign shiftLeft2Output = {SignExInstr[61:0], 1'b0, 1'b0};
+    assign pc_plus_4 = pc_current + 64'b0100;
+    assign branchAddResult = shiftLeft2Output + pc_plus_4;
+
+    wire PCSrc;
+
+    and andForPC(PCSrc, Zero, Branch);
+    PCmux PCmux1(pc_next, pc_plus_4, branchAddResult, PCSrc);   // (Y, D0, D1, S)
+
 
 endmodule
 
